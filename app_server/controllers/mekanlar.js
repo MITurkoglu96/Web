@@ -1,6 +1,8 @@
+var footer="Mustafa İsmail Türkoğlu"
 const anaSayfa=function(req, res, next) {
   res.render('mekanlar-liste', 
              { 'baslik': 'Anasayfa',
+               'footer':footer,
                'sayfaBaslik':{
                    'siteAd': 'Mekan32',
                    'aciklama': 'Isparta civarindaki mekanlari kesfedin'
@@ -14,7 +16,7 @@ const anaSayfa=function(req, res, next) {
                             'mesafe':'3km'
                         },
                         {
-                          'ad':'Antep Sofrası',
+                          'ad':'Gaziantep Sofrası',
                           'adres':'İyaşPark Yanı',
                           'puan':4,
                           'imkanlar':['Kebap Çeşitleri','Lahmacun&Pide','Baklava&Tatlı'],
@@ -58,6 +60,7 @@ const anaSayfa=function(req, res, next) {
 const mekanBilgisi=function(req, res, next) {
   res.render('mekan-detay', { 
       'baslik': 'Mekan Bilgisi',
+      'footer':footer,
       'sayfaBaslik': 'Starbucks',
       'mekanBilgisi':{
           'ad':'Starbucks',
@@ -89,10 +92,16 @@ const mekanBilgisi=function(req, res, next) {
            'yorumlar':[
                {
                    'yorumYapan':'Mustafa İsmail Türkoğlu',
-                   'puan':4,
-                   'tarih':'13 Ekim 2019',
+                   'puan':3,
+                   'tarih':'10 Ekim 2019',
                    'yorumMetni':'Kahveleri güzel'
-            }
+            },
+            {
+                'yorumYapan':'Mehmet Deniz',
+                'puan':1,
+                'tarih':'20 Ekim 2019',
+                'yorumMetni':'Kahveleri iyi değil'
+         }
         ]
         
           
