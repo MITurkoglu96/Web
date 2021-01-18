@@ -11,5 +11,5 @@ router.get('/mekan/:mekanid/yorum/yeni', ctrlMekanlar.yorumEkle);
 router.post('/mekan/:mekanid/yorum/yeni', ctrlMekanlar.yorumumuEkle);
 
 //diğer sayfalar
-router.get('/hakkinda',ctrlDigerleri.hakkinda);
+//router.get('/hakkinda',ctrlDigerleri.hakkinda);
 module.exports = router;
