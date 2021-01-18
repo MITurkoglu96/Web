@@ -1,120 +1,189 @@
-var footer="Mustafa İsmail Türkoğlu"
-const anaSayfa=function(req, res, next) {
-  res.render('mekanlar-liste', 
-             { 'baslik': 'Anasayfa',
-               'footer':footer,
-               'sayfaBaslik':{
-                   'siteAd': 'Mekan32',
-                   'aciklama': 'Isparta civarindaki mekanlari kesfedin'
-               },
-                    'mekanlar': [
-                        {
-                            'ad':'Starbucks',
-                            'adres':'Centrum Garden AVM',
-                            'puan':4,
-                            'imkanlar':['Dünya Kahveleri','Kekler','Pastalar'],
-                            'mesafe':'3km'
-                        },
-                        {
-                          'ad':'Gaziantep Sofrası',
-                          'adres':'İyaşPark Yanı',
-                          'puan':4,
-                          'imkanlar':['Kebap Çeşitleri','Lahmacun&Pide','Baklava&Tatlı'],
-                          'mesafe':'3km'                            
-                        },             
-                        {
-                            'ad':'Antre Gurme Cafe Kitchen',
-                            'adres':'Centrum Garden&İyaşPark AVM',
-                            'puan':4,
-                            'imkanlar':['Steak&Izgara&Tava ','Kahvaltı','Kebap Çeşitleri'],
-                            'mesafe':'3km'                            
-                        },
-                        {
-                          'ad':'Gloria Jeans',
-                          'adres':'SDU Doğu Kampüsü',
-                          'puan':3,
-                          'imkanlar':['Dünya Kahveleri','Çay','Pastalar','Kekler'],
-                          'mesafe':'10km'                            
-                        },
-                        {
-                            'ad':'Mackbear Coffee',
-                            'adres':'Fatih Mahallesi',
-                            'puan':3,
-                            'imkanlar':['Dünya Kahveleri','Kekler','Pastalar'],
-                            'mesafe':'3km'                            
-                        },
-                                                
-                        {
-                            'ad':'Gözde Balık Evi',
-                            'adres':'Merkez',
-                            'puan':3,
-                            'imkanlar':['Balık Çeşitleri','Izgara Balık'],
-                            'mesafe':'1km'                            
-                        },
+var request = require('postman-request');
+var express =require('express');
 
-                    ]
-             
-            });
-}
+var apiSecenekleri = {
+   sunucu : "https://mismailturkoglu1611012063.herokuapp.com",
+   apiYolu : '/api/mekanlar/',
+};
 
-const mekanBilgisi=function(req, res, next) {
-  res.render('mekan-detay', { 
-      'baslik': 'Mekan Bilgisi',
-      'footer':footer,
-      'sayfaBaslik': 'Starbucks',
-      'mekanBilgisi':{
-          'ad':'Starbucks',
-          'adres':'Centrum Garden',
-          'puan':4,
-          'imkanlar':['Dünya Kahveleri','Kekler','Pastalar'],
-          'koordinatlar':{
-              'enlem':37.78185,
-              'boylam':30.566034
-           },
-           'saatler':[
-               {
-                    'gunler':'Pazartesi-Cuma',
-                    'acilis':'7:00',
-                    'kapanis':'23:00',
-                    'kapali':false
-               },
-               {
-                    'gunler':'Cumartesi',
-                    'acilis':'9:00',
-                    'kapanis':'22:30',
-                    'kapali':false                    
-               },
-               {
-                    'gunler':'Pazar',
-                    'kapali':true                  
-               }
-           ],
-           'yorumlar':[
-               {
-                   'yorumYapan':'Mustafa İsmail Türkoğlu',
-                   'puan':3,
-                   'tarih':'10 Ekim 2019',
-                   'yorumMetni':'Kahveleri güzel'
-            },
-            {
-                'yorumYapan':'Mehmet Deniz',
-                'puan':1,
-                'tarih':'20 Ekim 2019',
-                'yorumMetni':'Kahveleri iyi değil'
-         }
-        ]
-        
-          
+var footer="Mustafa İsmail Türkoğlu 2021"
+
+var mesafeyiFormatla = function (mesafe) {
+  var yeniMesafe, birim;
+  if (mesafe > 1000) {
+    yeniMesafe = parseFloat(mesafe / 1000).toFixed(2);
+    birim = " km";
+  } else {
+    yeniMesafe = parseFloat(mesafe).toFixed(1);
+    birim = " m";
+  }
+  return yeniMesafe + birim;
+};
+
+var anasayfayiOlustur = function(req, res, cevap, mekanListesi){
+    var mesaj;
+    //Gelen mekanlistesi eğer dizi tipinde değilse hata ver.
+    if (!(mekanListesi instanceof Array)) {
+    mesaj = "API HATASI : Birşeyler Ters Gitti";
+    mekanListesi = [];
+   } else {//Eğer belirlenen mesafe içinde mekan bulunmadıysa bilgilendir.
+    if (!mekanListesi.length) {
+      mesaj = "Civarda Herhangi Bir Mekan Bulunamadı!";
     }
-});
-}
+  }
+  res.render("mekanlar-liste", 
+  {
+    baslik: "Mekan32",
+    sayfaBaslik: {
+      siteAd: "Mekan32",
+      aciklama: "Isparta civarındaki mekanları keşfedin!",
+    },
+    footer:footer,
+    mekanlar: mekanListesi,
+    mesaj: mesaj,
+    cevap: cevap,
+  });
+};
+const anaSayfa = function (req, res) {
+    var istekSecenekleri = 
+    {//tam yol
+    url: apiSecenekleri.sunucu + apiSecenekleri.apiYolu,
+    //Veri çekeceğimiz için GET metodunu kullancağız.
+    method: "GET",
+    //Dönen veri json formatında olacak
+    json: {},
+    //Sorgu parametreleri.URL'de yazılan enlem boylamı al
+    //localhost:3000/?enlem=37&boylam=30 gibi
+    qs : {
+      enlem: req.query.enlem,
+      boylam: req.query.boylam,
+      },
+    };//istekte bulun
+    request(
+      istekSecenekleri,
+      //geri dönüş metodu
+      function (hata, cevap, mekanlar) {
+      var i, gelenMekanlar;
+      gelenMekanlar = mekanlar;
+      //sadece 200 durum kodunda ve mekanlar doluyken işlem yap
+      if (!hata && gelenMekanlar.length) {
+        for (i=0; i<gelenMekanlar.length; i++) {
+          gelenMekanlar[i].mesafe = mesafeyiFormatla(gelenMekanlar[i].mesafe);
+        }
+      }
+      anasayfayiOlustur(req, res, cevap, gelenMekanlar);
+    });
+  };
 
-const yorumEkle=function(req, res, next) {
-  res.render('yorum-ekle', { title: 'Yorum Ekle' });
-}
+var detaySayfasiOlustur = function (req, res, mekanDetaylari) {
+  res.render("mekan-detay", {
+    baslik: mekanDetaylari.ad,
+    footer:footer,
+    sayfaBaslik: mekanDetaylari.ad,
+    mekanBilgisi: mekanDetaylari,
+  });
+};
 
-module.exports={
-anaSayfa,
-mekanBilgisi,
-yorumEkle
-}
+var hataGoster = function (req, res, durum) {
+  var baslik, icerik;
+  if ((durum = 404)) {
+    baslik = "404, Sayfa Bulunamadı!";
+    icerik = "Kusura bakma sayfayı  bulamadık!";
+  } else {
+    baslik = durum+", Bir şeyler Ters Gitti!";
+    icerik = "Ters giden birşey var!";
+  }
+  res.status(durum);
+  res.render("hata", {
+    baslik: baslik,
+    icerik: icerik,
+  });
+};
+
+var mekanBilgisiGetir = function (req, res, callback) {
+    //istek seçeneklerini ayarla
+    var istekSecenekleri = {
+    //tam yol
+    url: apiSecenekleri.sunucu + apiSecenekleri.apiYolu + req.params.mekanid,
+    //Veri çekeceğimiz için GET metodunu kullan
+    method: "GET",
+    //Dönen veri json formatında olacak
+    json: {},
+  };//istekte bulun
+  request(istekSecenekleri, 
+    //geri dönüş metodu
+    function (hata, cevap, mekanDetaylari) {
+    var gelenMekan = mekanDetaylari;
+    if (cevap.statusCode == 200) {
+      //enlem ve boylam bir dizi şeklinde bunu ayır.
+      //0'da enlem 1 de boylam var
+      gelenMekan.koordinatlar = {
+        enlem: mekanDetaylari.koordinatlar[0],
+        boylam: mekanDetaylari.koordinatlar[1],
+      };
+      callback(req, res, gelenMekan);
+    } else {
+      hataGoster(req, res, cevap.statusCode);
+    }
+  });
+};
+
+const mekanBilgisi = function (req, res, callback) {
+  mekanBilgisiGetir(req, res, function (req, res, cevap) {
+    detaySayfasiOlustur(req, res, cevap);
+  });
+};
+
+var yorumSayfasiOlustur = function (req, res, mekanBilgisi) {
+  res.render("yorum-ekle", {
+    baslik: mekanBilgisi.ad + " Mekanına Yorum Ekle",
+    sayfaBaslik: mekanBilgisi.ad + " Mekanına Yorum Ekle",
+    hata: req.query.hata,
+    footer:footer
+  });
+};
+
+const yorumEkle = function (req, res) {
+  mekanBilgisiGetir(req, res, function (req, res, cevap) {
+    yorumSayfasiOlustur(req, res, cevap);
+  });
+};
+
+const yorumumuEkle = function (req, res) {
+  var istekSecenekleri, gonderilenYorum, mekanid;
+  mekanid = req.params.mekanid;
+  gonderilenYorum = {
+    yorumYapan: req.body.name,
+    puan: parseInt(req.body.rating, 10),
+    yorumMetni: req.body.review,
+  };
+  istekSecenekleri = {
+    url: apiSecenekleri.sunucu + apiSecenekleri.apiYolu + mekanid + '/yorumlar',
+    method: "POST",
+    json: gonderilenYorum,
+  };
+  if (!gonderilenYorum.yorumYapan || !gonderilenYorum.puan || !gonderilenYorum.yorumMetni ) {
+    res.redirect('/mekan/' + mekanid + '/yorum/yeni?hata=evet');
+  } else {
+    request(
+        istekSecenekleri, 
+        function (hata, cevap, body) {
+            if (cevap.statusCode === 201) {
+                res.redirect('/mekan/' + mekanid);
+            } 
+            else if (cevap.statusCode === 400 && body.name && body.name === "ValidationError" ) {
+                res.redirect('/mekan/' + mekanid + '/yorum/yeni?hata=evet');
+            } 
+            else {
+                hataGoster(req, res, cevap.statusCode);
+            }
+        });
+    }
+};
+
+module.exports = {
+  anaSayfa,
+  mekanBilgisi,
+  yorumEkle,
+  yorumumuEkle,
+};
