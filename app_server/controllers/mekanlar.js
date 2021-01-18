@@ -1,13 +1,11 @@
-var request = require('postman-request');
-var express =require('express');
+var request = require("postman-request");
+var express =require("express");
 
 var apiSecenekleri = {
    sunucu : "https://mismailturkoglu1611012063.herokuapp.com",
-   apiYolu : '/api/mekanlar/',
+   apiYolu : "/api/mekanlar/",
 };
-
-var footer="Mustafa İsmail Türkoğlu 2021"
-
+//var footer="Mustafa İsmail Türkoğlu 2021"
 var mesafeyiFormatla = function (mesafe) {
   var yeniMesafe, birim;
   if (mesafe > 1000) {
@@ -31,19 +29,19 @@ var anasayfayiOlustur = function(req, res, cevap, mekanListesi){
       mesaj = "Civarda Herhangi Bir Mekan Bulunamadı!";
     }
   }
-  res.render("mekanlar-liste", 
-  {
+
+  res.render("mekanlar-liste", {
     baslik: "Mekan32",
     sayfaBaslik: {
       siteAd: "Mekan32",
       aciklama: "Isparta civarındaki mekanları keşfedin!",
     },
-    footer:footer,
     mekanlar: mekanListesi,
     mesaj: mesaj,
-    cevap: cevap,
+    cevap: cevap
   });
 };
+
 const anaSayfa = function (req, res) {
     var istekSecenekleri = 
     {//tam yol
@@ -60,12 +58,9 @@ const anaSayfa = function (req, res) {
       },
     };//istekte bulun
     request(
-      istekSecenekleri,
-      //geri dönüş metodu
-      function (hata, cevap, mekanlar) {
+      istekSecenekleri,function (hata, cevap, mekanlar) {
       var i, gelenMekanlar;
       gelenMekanlar = mekanlar;
-      //sadece 200 durum kodunda ve mekanlar doluyken işlem yap
       if (!hata && gelenMekanlar.length) {
         for (i=0; i<gelenMekanlar.length; i++) {
           gelenMekanlar[i].mesafe = mesafeyiFormatla(gelenMekanlar[i].mesafe);
@@ -78,7 +73,6 @@ const anaSayfa = function (req, res) {
 var detaySayfasiOlustur = function (req, res, mekanDetaylari) {
   res.render("mekan-detay", {
     baslik: mekanDetaylari.ad,
-    footer:footer,
     sayfaBaslik: mekanDetaylari.ad,
     mekanBilgisi: mekanDetaylari,
   });
@@ -88,9 +82,9 @@ var hataGoster = function (req, res, durum) {
   var baslik, icerik;
   if ((durum = 404)) {
     baslik = "404, Sayfa Bulunamadı!";
-    icerik = "Kusura bakma sayfayı  bulamadık!";
+    icerik = "Kusura bakma sayfayı bulamadık!";
   } else {
-    baslik = durum+", Bir şeyler Ters Gitti!";
+    baslik = durum + ", Bir şeyler Ters Gitti!";
     icerik = "Ters giden birşey var!";
   }
   res.status(durum);
@@ -110,9 +104,7 @@ var mekanBilgisiGetir = function (req, res, callback) {
     //Dönen veri json formatında olacak
     json: {},
   };//istekte bulun
-  request(istekSecenekleri, 
-    //geri dönüş metodu
-    function (hata, cevap, mekanDetaylari) {
+  request(istekSecenekleri, function (hata, cevap, mekanDetaylari) {
     var gelenMekan = mekanDetaylari;
     if (cevap.statusCode == 200) {
       //enlem ve boylam bir dizi şeklinde bunu ayır.
@@ -139,7 +131,6 @@ var yorumSayfasiOlustur = function (req, res, mekanBilgisi) {
     baslik: mekanBilgisi.ad + " Mekanına Yorum Ekle",
     sayfaBaslik: mekanBilgisi.ad + " Mekanına Yorum Ekle",
     hata: req.query.hata,
-    footer:footer
   });
 };
 

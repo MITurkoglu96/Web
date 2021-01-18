@@ -9,8 +9,8 @@ const cevapOlustur=function(res,status,content){
 
 const mekanlariListele= async(req, res)=> {
 	//URL'dedn enlem ve boylam parametrelerini alı
-	var boylam= parseFloat(req.query.boylam);
-	var enlem= parseFloat(req.query.enlem);
+	var boylam = parseFloat(req.query.boylam);
+	var enlem = parseFloat(req.query.enlem);
 	//alınan bilgilerden nokta tanımla
 	var nokta= {
 		type: "Point",
@@ -106,8 +106,7 @@ const mekanGuncelle=function(req, res) {
 	}
 		Mekan
 		.findById(req.params.mekanid)
-		//- işareti yorumlar ve puan dışındaki herşeyi almamızı söyler
-		.select('-yorumlar -puan')
+		.select('-yorumlar -puan')//- işareti yorumlar ve puan dışındaki herşeyi almamızı söyler
 		.exec(
 			function(hata, gelenMekan){
 				if(!gelenMekan){
@@ -118,11 +117,12 @@ const mekanGuncelle=function(req, res) {
 					cevapOlustur(res, 400, hata);
 					return;
 				}
-					gelenMekan.ad= req.body.ad;
-					gelenMekan.adres= req.body.adres;
-					gelenMekan.imkanlar= req.body.imkanlar.split(",");
-					gelenMekan.koordinatlar= [parseFloat(req.body.enlem), parseFloat(req.body.boylam)];
-					gelenMekan.saatler= [{
+				gelenMekan.ad= req.body.ad;
+				gelenMekan.adres= req.body.adres;
+				gelenMekan.imkanlar= req.body.imkanlar.split(",");
+				gelenMekan.koordinatlar= [parseFloat(req.body.enlem), parseFloat(req.body.boylam)];
+				gelenMekan.saatler= [
+					{
 						gunler: req.body.gunler1,
 						acilis: req.body.acilis1,
 						kapanis: req.body.kapanis1,
@@ -133,7 +133,7 @@ const mekanGuncelle=function(req, res) {
 						kapanis: req.body.kapanis2,
 						kapali: req.body.kapali2
 					}];
-					gelenMekan.save(function(hata, mekan){
+				gelenMekan.save(function(hata, mekan){
 					if (hata){
 						cevapOlustur(res, 404, hata);
 					} else{
