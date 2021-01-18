@@ -72,6 +72,7 @@ var detaySayfasiOlustur = function (req, res, mekanDetaylari) {
   res.render("mekan-detay", 
   {
     baslik: mekanDetaylari.ad,
+    footer:footer,
     sayfaBaslik: mekanDetaylari.ad,
     mekanBilgisi: mekanDetaylari,
   });
