@@ -16,7 +16,7 @@ var mesafeyiFormatla = function (mesafe) {
     birim = " m";
   }
   return yeniMesafe + birim;
-}
+};
 
 var anasayfayiOlustur = function(req, res, cevap, mekanListesi){
     var mesaj;
